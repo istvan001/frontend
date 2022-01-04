@@ -1,4 +1,3 @@
-import react from 'react';
 import React, { Component } from 'react';
 import { StyleSheet, ActivityIndicator, FlatList, Text, View, Image } from 'react-native';
 import{AirbnbRating} from 'react-native-ratings'
@@ -11,15 +10,14 @@ export default class FetchExample extends Component {
       isLoading: true,
       dataSource:[],
       rating:[],
+      megnyomva:[],
       szam:0
       }
   
   
 }
 
-ratingCompleted(rating) {
-  console.log("Rating is: " + rating)
-}
+
   componentDidMount(){
      fetch('https://s1.siralycore.hu:8082/etterem')
       .then((response) => response.json())
@@ -39,13 +37,18 @@ ratingCompleted(rating) {
         this.setState({
           isLoading: false,
           rating: responseJson,
-        }, function(){
-        });
-      })
+        }, function(){          
+      });
+    })
       .catch((error) =>{
         console.error(error);
       });
+
+      
+
+       
   }
+  
 
   render(){
     if(this.state.isLoading){
@@ -63,7 +66,7 @@ ratingCompleted(rating) {
           renderItem={({item}) => 
           <View style={styles.card}>
             <View style={styles.center}>
-              <Image style={styles.image} source={require('./kepek/'+item.kep)}/>
+              <Image style={styles.image} source={{uri: 'https://s1.siralycore.hu:8082/kepek/'+item.kep}}/>
             </View>
             <Text style={styles.title}>{item.nev}</Text>
             <Text style={styles.label}>Cím: {item.lakcim}</Text>
@@ -76,11 +79,24 @@ ratingCompleted(rating) {
             reviews={[1,2,3,4,5]}
             defaultRating={Math.floor(item.atlag)}
             size={20}
-            isDisabled={false}
+            isDisabled={true}
             
 
 
             />
+            <AirbnbRating
+            count={5}
+            reviews={[1,2,3,4,5]}
+            defaultRating={0}
+            size={20}
+            isDisabled={false}
+             
+             />
+
+            
+
+
+            
             
 
 
@@ -89,7 +105,7 @@ ratingCompleted(rating) {
             
 
           
-            <Text style={styles.label}> {item.atlag}/5</Text>
+            
           </View>
           }
           keyExtractor={({id}, index) => id}
