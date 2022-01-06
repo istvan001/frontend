@@ -85,7 +85,7 @@ export default class FetchExample extends Component {
        
   }
 
-  nov = ()=>{
+  nov = async(szam)=>{
     fetch('https://s1.siralycore.hu:8082/etterem_abc_rend' )
       .then((response) => response.json())
       .then((responseJson) => {
@@ -104,7 +104,7 @@ export default class FetchExample extends Component {
         console.error(error);
       });
   }
-  csok = ()=>{
+  csok = async(szam)=>{
     fetch('https://s1.siralycore.hu:8082/etterem_abc_csok' )
       .then((response) => response.json())
       .then((responseJson) => {
@@ -141,7 +141,6 @@ export default class FetchExample extends Component {
    }
    
 const ratingChanged = (ratings) => {
-  alert(ratings)
   this.setState({aktid:ratings})
   
 }
@@ -153,13 +152,13 @@ const ratingChanged = (ratings) => {
           
           <TouchableOpacity
               style={{borderWidth:1,borderRadius:10,width:150,height:30,margin:5}}
-              onPress={()=>this.nov()}
+              onPress={async(szam)=>this.nov()}
               >
             <Text style={{textAlign:"center",fontSize:20}}>Rendezés (ABC)↑</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={{borderWidth:1,borderRadius:10,width:150,height:30,margin:5}}
-              onPress={()=>this.csok()}
+              onPress={async(szam)=>this.csok()}
               >
             <Text style={{textAlign:"center",fontSize:20}}>Rendezés (ABC)↓</Text>
             </TouchableOpacity>
@@ -184,7 +183,7 @@ const ratingChanged = (ratings) => {
            <Text style={styles.label}>Cím: {item.lakcim}</Text>
            <Text style={styles.label}>Nyitvatartás: {"\n"}{item.nyitas}</Text>
            <Text style={styles.label}>Telefon: {item.telefon}</Text>
-           <Text style={styles.label}>Értékelés:</Text>
+           <Text style={styles.label1}>Értékelés:</Text>
 
            <AirbnbRating
            count={5}
@@ -197,6 +196,8 @@ const ratingChanged = (ratings) => {
 
 
            />
+
+<Text style={styles.label1}>Értékeld:</Text>
           <TouchableOpacity
 onPress={ ()=>this.kattintas(item.id)}
 
@@ -282,5 +283,10 @@ const styles = StyleSheet.create({
  image2:{
    width: 50,
    height: 50
+ },
+ label1:{
+  padding: 5,
+  fontSize:20
+
  }
 });
