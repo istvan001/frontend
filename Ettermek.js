@@ -15,7 +15,10 @@ export default class FetchExample extends Component {
       aktid:1
       }
   
-  
+
+      const ipcim="172.16.0.26"
+
+     
 }
 
 
@@ -34,6 +37,7 @@ export default class FetchExample extends Component {
      .catch((error) =>{
        console.error(error);
      });
+
      fetch('https://s1.siralycore.hu:8082/etterem2')
      .then((response) => response.json())
      .then((responseJson) => {
@@ -46,6 +50,7 @@ export default class FetchExample extends Component {
      .catch((error) =>{
        console.error(error);
      });
+    
 
      
 
@@ -200,6 +205,7 @@ const ratingChanged = (ratings) => {
 <Text style={styles.label1}>Értékeld:</Text>
           <TouchableOpacity
 onPress={ ()=>this.kattintas(item.id)}
+
 
 style={{alignItems:"center"}}
 >
