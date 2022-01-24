@@ -31,22 +31,9 @@ toggleExpanded = () => {
 };
 
 
-
-
-  componentDidMount(){
-    fetch('https://s1.siralycore.hu:8082/etterem')
-     .then((response) => response.json())
-     .then((responseJson) => {
-       this.setState({
-         isLoading: false,
-         dataSource: responseJson,
-       }, function(){
-       });
-     })
-     .catch((error) =>{
-       console.error(error);
-     });
-     fetch('https://s1.siralycore.hu:8082/etterem2')
+frissit=()=>
+{
+  fetch('https://s1.siralycore.hu:8082/etterem2')
      .then((response) => response.json())
      .then((responseJson) => {
        this.setState({
@@ -58,6 +45,23 @@ toggleExpanded = () => {
      .catch((error) =>{
        console.error(error);
      });
+}
+
+  componentDidMount(){
+    /*fetch('https://s1.siralycore.hu:8082/etterem')
+     .then((response) => response.json())
+     .then((responseJson) => {
+       this.setState({
+         isLoading: false,
+         dataSource: responseJson,
+       }, function(){
+       });
+     })
+     .catch((error) =>{
+       console.error(error);
+     });*/
+     
+     this.frissit()
 
      let m=this.state.megnyomva;
         for (let elem of this.state.dataSource)
@@ -82,6 +86,7 @@ toggleExpanded = () => {
     } )
     .then((response) => response.text())
     .then((szoveg) => {
+      this.frissit()
 
       alert(szoveg)
     })
@@ -110,6 +115,8 @@ toggleExpanded = () => {
         //alert(szoveg)
         this.setState({nev:""})
         this.setState({velemeny:""})
+
+        this.frissit()
         
         
       })
@@ -176,6 +183,9 @@ toggleExpanded = () => {
     let m=this.state.megnyomva
     m[sorszam]=!m[sorszam]
     this.setState({megnyomva:m})
+
+
+    
   }
   megnyomas2=(sorszam)=>{
     //alert(sorszam)
@@ -247,25 +257,15 @@ const ratingChanged = (ratings) => {
          renderItem={({item}) => 
          <View style={styles.card}>
            <View style={styles.center}>
-             <Image style={styles.image} source={{uri: 'https://s1.siralycore.hu:8082/kepek/'+item.kep}}/>
+             <Image style={styles.image}  source={{uri: 'http://localhost:8080/'+item.kep}}/>
            </View>
            <Text style={styles.title}>{item.nev}</Text>
            <Text style={styles.label}>Cím: {item.lakcim}</Text>
            <Text style={styles.label}>Nyitvatartás: {"\n"}{item.nyitas}</Text>
            <Text style={styles.label}>Telefon: {item.telefon}</Text>
-           <Text style={styles.label1}>Értékelés:</Text>
+           <Text style={styles.label1}>Értékelés: {Math.round((item.atlag + Number.EPSILON) * 100) / 100}/5 </Text>
 
-           <AirbnbRating
-           count={5}
-           reviews={["1/5","2/5","3/5","4/5","5/5"]}
-           reviewColor="black"
-           defaultRating={Math.floor(item.atlag)}
-           size={20}
-           isDisabled={true}
-           
-
-
-           />
+          
 
           <Text style={styles.label1}>Értékeld:</Text>
                     <TouchableOpacity
@@ -318,7 +318,7 @@ const ratingChanged = (ratings) => {
           value={this.state.nev}
         />
          <Text style={styles.label1}>
-         Komment:
+         Vélemény:
         </Text>
         <TextInput
           style={styles.szovegdoboz2}
