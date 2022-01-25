@@ -257,7 +257,7 @@ const ratingChanged = (ratings) => {
          renderItem={({item}) => 
          <View style={styles.card}>
            <View style={styles.center}>
-             <Image style={styles.image}  source={{uri: 'http://localhost:8080/'+item.kep}}/>
+             <Image style={styles.image}  source={{uri: 'https://s1.siralycore.hu:8082/kepek/'+item.kep}}/>
            </View>
            <Text style={styles.title}>{item.nev}</Text>
            <Text style={styles.label}>Cím: {item.lakcim}</Text>
