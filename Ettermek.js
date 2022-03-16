@@ -11,6 +11,7 @@ export default class FetchExample extends Component {
     this.state ={
       isLoading: true,
       dataSource:[],
+      dataSource2:[],
       rating:[],
       szam1:1,
       aktid:1,
@@ -45,6 +46,8 @@ frissit=()=>
      .catch((error) =>{
        console.error(error);
      });
+
+     
 }
 
   componentDidMount(){
@@ -128,6 +131,39 @@ frissit=()=>
 
   }
 
+
+  velemeny =(szam)=>
+  
+  {
+    
+    alert(szam)
+    let bemenet={
+      bevitel1:szam
+      
+    }
+  
+    fetch('https://s1.siralycore.hu:8082/velemenyek' ,{
+      method: "POST",
+      body: JSON.stringify(bemenet),
+      headers: {"Content-type": "application/json; charset=UTF-8"}
+      } )
+      .then((response) => response.json())
+      .then((adat) => {
+       
+  
+        
+        this.setState({
+          isLoading: false,
+          dataSource2: adat,
+        }, function(){          
+      });
+      })
+      .catch((error) =>{
+        console.error(error);
+      });      
+    }
+    
+
   nov = async()=>{
     return fetch('https://s1.siralycore.hu:8082/etterem_abc_rend' )
     .then((response) => response.json())
@@ -183,7 +219,7 @@ frissit=()=>
     let m=this.state.megnyomva
     m[sorszam]=!m[sorszam]
     this.setState({megnyomva:m})
-
+    this.velemeny(sorszam)
 
     
   }
@@ -192,6 +228,8 @@ frissit=()=>
     let m=this.state.megnyomva2
     m[sorszam]=!m[sorszam]
     this.setState({megnyomva2:m})
+    
+    
   }
 
 
@@ -285,21 +323,27 @@ const ratingChanged = (ratings) => {
             </TouchableOpacity>
 
 
-          <TouchableOpacity onPress={async()=>this.megnyomas(item.id)} style={styles.gomb}> 
+          <TouchableOpacity onPress={async()=>this.megnyomas(item.id) }  style={styles.gomb}> 
           <Text style={styles.label1}>Vélemények</Text>
           </TouchableOpacity>
 
-          <Collapsible collapsed={this.state.megnyomva[item.id]} >
-            
+          <Collapsible collapsed={this.state.megnyomva[item.id]}  >
+          <FlatList
+            data={this.state.dataSource2}
+        
+            renderItem={({item}) =>
             <View style={styles.velemeny}>
+            
             <Text style={{ padding: 5,fontSize:17}}>Név:</Text>
             <Text style={{padding: 5,fontSize:15,marginLeft:10}}>{item.velemeny_nev}</Text>
             <Text style={{padding: 5,fontSize:17}}>Vélemény:</Text>
             <Text style={{padding: 5,fontSize:15,marginLeft:10}}>{item.velemeny}</Text>
-
-
-            
             </View>
+            }
+            keyExtractor={({velemenyid}, index) => velemenyid}
+
+
+            />
           
 
           <TouchableOpacity onPress={()=>this.megnyomas2(item.id)} style={styles.gomb}> 
