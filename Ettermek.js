@@ -1,8 +1,8 @@
 import React, { Component,useState} from 'react';
 import { StyleSheet, ActivityIndicator, FlatList, Text, View, Image,TouchableOpacity,TextInput } from 'react-native';
-import{Rating,AirbnbRating} from 'react-native-ratings';
-import ReactStars from 'react-stars';
-import Collapsible from 'react-native-collapsible';
+import StarRating from 'react-native-star-rating';
+import {Collapse,CollapseHeader, CollapseBody} from 'accordion-collapse-react-native';
+const IP = require('./ipcim.js');
 
 export default class FetchExample extends Component {
 
@@ -22,7 +22,8 @@ export default class FetchExample extends Component {
       megnyomva2:[],
       megnyom:[],
       nev: '',
-      velemeny:""
+      velemeny:"",
+      starCount: 3.5
       }
   
   
@@ -34,7 +35,7 @@ toggleExpanded = () => {
 
 frissit=()=>
 {
-  fetch('https://s1.siralycore.hu:8082/etterem2')
+  fetch(IP.ipcim+'/etterem2')
      .then((response) => response.json())
      .then((responseJson) => {
        this.setState({
@@ -49,20 +50,12 @@ frissit=()=>
 
      
 }
+onStarRatingPress(rating) {
+  
+}
 
   componentDidMount(){
-    /*fetch('https://s1.siralycore.hu:8082/etterem')
-     .then((response) => response.json())
-     .then((responseJson) => {
-       this.setState({
-         isLoading: false,
-         dataSource: responseJson,
-       }, function(){
-       });
-     })
-     .catch((error) =>{
-       console.error(error);
-     });*/
+   
      
      this.frissit()
 
@@ -75,14 +68,14 @@ frissit=()=>
  }
 
 
- felvitel= (szam)=>{
+ felvitel= (szam1,szam2)=>{
   alert("Megnyomva")
   let bemenet={
-    bevitel1:szam,
-    bevitel2:this.state.aktid
+    bevitel1:szam2,
+    bevitel2:szam1
   }
 
-  fetch('https://s1.siralycore.hu:8082/ert_felvi' ,{
+  fetch(IP.ipcim+'/ert_felvi' ,{
     method: "POST",
     body: JSON.stringify(bemenet),
     headers: {"Content-type": "application/json; charset=UTF-8"}
@@ -107,7 +100,7 @@ frissit=()=>
       bevitel3: this.state.velemeny
     }
  
-    fetch('https://s1.siralycore.hu:8082/vfelvi', {
+    fetch(IP.ipcim+'/vfelvi', {
       method: "POST",
       body: JSON.stringify(bemenet),
       headers: {"Content-type": "application/json; charset=UTF-8"}
@@ -142,7 +135,7 @@ frissit=()=>
       
     }
   
-    fetch('https://s1.siralycore.hu:8082/velemenyek' ,{
+    fetch('http://localhost:8080/velemenyek' ,{
       method: "POST",
       body: JSON.stringify(bemenet),
       headers: {"Content-type": "application/json; charset=UTF-8"}
@@ -160,12 +153,12 @@ frissit=()=>
       })
       .catch((error) =>{
         console.error(error);
-      });      
+      });       
     }
     
 
   nov = async()=>{
-    return fetch('https://s1.siralycore.hu:8082/etterem_abc_rend' )
+    return fetch(IP.ipcim+'/etterem_abc_rend' )
     .then((response) => response.json())
     .then((responseJson) => {
       this.setState({
@@ -179,7 +172,7 @@ frissit=()=>
     });
   }
   csok = async(szam)=>{
-    return fetch('https://s1.siralycore.hu:8082/etterem_abc_csok' )
+    return fetch(IP.ipcim+'/etterem_abc_csok' )
     .then((response) => response.json())
     .then((responseJson) => {
       this.setState({
@@ -194,7 +187,7 @@ frissit=()=>
   }
 
   ert = async(szam)=>{
-    return fetch('https://s1.siralycore.hu:8082/ert_rend' )
+    return fetch(IP.ipcim+'/ert_rend' )
     .then((response) => response.json())
     .then((responseJson) => {
       this.setState({
@@ -231,6 +224,18 @@ frissit=()=>
     
     
   }
+  onStarRatingPress(ratings,hanyadik) {
+        
+    alert(ratings)
+    alert(hanyadik)
+   // this.setState({starCount:ratings})
+    let m=this.state.megnyomva
+    m[hanyadik]=ratings
+    this.setState({megnyomva:m})
+    this.felvitel(ratings,hanyadik)
+    this.setState({starCount:ratings})
+
+  }
 
 
   
@@ -244,13 +249,8 @@ frissit=()=>
      )
    }
    
-const ratingChanged = (ratings) => {
-  alert(ratings)
-  this.setState({aktid:ratings})
- 
-  
-  
-}
+
+
 
    
    return(
@@ -259,10 +259,16 @@ const ratingChanged = (ratings) => {
 
       <View>
       
-          <TouchableOpacity onPress={this.toggleExpanded} style={styles.gomb1}> 
-            <Text style={styles.label1}>Rendezés</Text>
-          </TouchableOpacity>
-          <Collapsible collapsed={this.state.collapsed}>
+      <Collapse>
+      
+      <CollapseHeader style={{borderWidth:1,borderRadius:10,width:200,height:40,margin:5,backgroundColor:"white"}}>
+        
+        
+        <Text style={{textAlign:"center",fontSize:25}}>Rendezés</Text>
+      
+      </CollapseHeader>
+     
+      <CollapseBody>
             <View style={{alignItems:"center"}}>
           <TouchableOpacity
               style={{borderWidth:1,borderRadius:10,width:170,height:30,margin:5,backgroundColor:"white"}}
@@ -284,7 +290,9 @@ const ratingChanged = (ratings) => {
             </TouchableOpacity>
             </View>
 
-            </Collapsible>
+            </CollapseBody>
+
+            </Collapse>
 
 
 
@@ -295,19 +303,20 @@ const ratingChanged = (ratings) => {
          renderItem={({item}) => 
          <View style={styles.card}>
            <View style={styles.center}>
-             <Image style={styles.image}  source={{uri: 'https://s1.siralycore.hu:8082/kepek/'+item.kep}}/>
+             <Image style={styles.image}  source={{uri: IP.ipcim+'/kepek/'+item.kep}}/>
            </View>
            <Text style={styles.title}>{item.nev}</Text>
            <Text style={styles.label}>Cím: {item.lakcim}</Text>
            <Text style={styles.label}>Nyitvatartás: {"\n"}{item.nyitas}</Text>
            <Text style={styles.label}>Telefon: {item.telefon}</Text>
-           <Text style={styles.label1}>Értékelés: {Math.round((item.atlag + Number.EPSILON) * 100) / 100}/5 </Text>
+           <Text style={{padding: 5,fontSize:20,}}>Értékelés: {Math.round((item.atlag + Number.EPSILON) * 100) / 100}/5 </Text>
 
           
 
-          <Text style={styles.label1}>Értékeld:</Text>
-                    <TouchableOpacity
-          onPress={ ()=>this.kattintas(item.id)}
+          <Text style={{padding: 5,fontSize:20,}}>Értékeld:</Text>
+          
+                 {/*<TouchableOpacity
+          onPress=
 
           style={{alignItems:"center"}}
           >
@@ -320,15 +329,37 @@ const ratingChanged = (ratings) => {
             color2={'#ffd700'} />
             
           
-            </TouchableOpacity>
+                 </TouchableOpacity>*/}
+            <StarRating
+        disabled={false}
+        maxStars={5}
+        rating={this.state.starCount}
+        selectedStar={(ratings) => this.onStarRatingPress(ratings,item.id)}
+        fullStarColor='#ffd700'
+        
+      />
+ 
+            
 
 
-          <TouchableOpacity onPress={async()=>this.megnyomas(item.id) }  style={styles.gomb}> 
-          <Text style={styles.label1}>Vélemények</Text>
-          </TouchableOpacity>
+            <Collapse
+            
 
-          <Collapsible collapsed={this.state.megnyomva[item.id]}  >
-          <FlatList
+            >
+            <CollapseHeader style={styles.gomb} onClick ={ ()=>this.velemeny(item.id)}>
+              <View>
+              
+                  <Text style={styles.label1}>Vélemények</Text>
+                
+              
+                  
+                  </View>
+            </CollapseHeader>
+  
+  
+            
+              <CollapseBody>
+              <FlatList
             data={this.state.dataSource2}
         
             renderItem={({item}) =>
@@ -344,13 +375,20 @@ const ratingChanged = (ratings) => {
 
 
             />
+            
+           
+
           
 
-          <TouchableOpacity onPress={()=>this.megnyomas2(item.id)} style={styles.gomb}> 
-          <Text style={styles.label1}>Saját Vélemény</Text>
-          </TouchableOpacity>
-
-          <Collapsible collapsed={this.state.megnyomva2[item.id]}>
+          <Collapse>
+              <CollapseHeader style={styles.gomb}>
+                <View>
+                
+                    <Text style={styles.label1}>Saját Vélemény</Text>
+                  
+                </View>
+              </CollapseHeader>
+              <CollapseBody style={{alignItems:"center"}}>
           <View style={{borderWidth:1,borderRadius:10,padding: 10,alignItems:"center",borderRadius:20,marginLeft:20,marginRight:20}}>
          <Text style={styles.label1}>
          Név:
@@ -378,16 +416,22 @@ const ratingChanged = (ratings) => {
           </View>
         </TouchableOpacity>
             </View>
-          </Collapsible>
+            </CollapseBody>
+          </Collapse>
 
-          </Collapsible>
+
+
+
+            </CollapseBody>
+            </Collapse>
+
 
 
            
          </View>
          }
          keyExtractor={({id}, index) => id}
-       />
+        />
      </View>
    );
  }
@@ -443,11 +487,12 @@ const styles = StyleSheet.create({
   },
   label1:{
    padding: 5,
-   fontSize:20
+   fontSize:20,
+   textAlign:'center'
  
   },
   gomb:{
-   padding: 10,
+    
     margin: 10,
     marginBottom: 10,
     width: 250,
@@ -489,7 +534,7 @@ const styles = StyleSheet.create({
  
    szovegdoboz:
    {
-     padding:10,
+     paddingLeft:5,
      borderWidth:1,
      borderRadius:10,
      width:200,

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {StyleSheet, FlatList, ActivityIndicator, Text, View, TouchableOpacity } from 'react-native';
 import { Col, Row, Grid } from 'react-native-easy-grid';
+const IP = require('./ipcim.js');
 
 export default class FetchExample extends Component {
 
@@ -15,7 +16,7 @@ export default class FetchExample extends Component {
   }
 
   componentDidMount(){
-    return fetch('https://s1.siralycore.hu:8082/etterem')
+    return fetch(IP.ipcim+'/etterem')
       .then((response) => response.json())
       .then((responseJson) => {
         this.setState({
@@ -34,7 +35,7 @@ export default class FetchExample extends Component {
     let bemenet={
       bevitel1:szam
     }
-    return fetch('https://s1.siralycore.hu:8082/etlapok', {
+    return fetch(IP.ipcim+'/etlapok', {
       method: "POST",
       body: JSON.stringify(bemenet),
       headers: {"Content-type": "application/json; charset=UTF-8"}
