@@ -1,7 +1,7 @@
 import React, { Component,useState} from 'react';
-import { StyleSheet, ActivityIndicator, FlatList, Text, View, Image,TouchableOpacity,TextInput } from 'react-native';
+import { StyleSheet, ActivityIndicator, FlatList, Text, View, Image,TouchableOpacity,TextInput, Touchable } from 'react-native';
 import StarRating from 'react-native-star-rating';
-import {Collapse,CollapseHeader, CollapseBody} from 'accordion-collapse-react-native';
+import {AccordionList,Collapse,CollapseHeader, CollapseBody} from 'accordion-collapse-react-native';
 const IP = require('./ipcim.js');
 
 export default class FetchExample extends Component {
@@ -50,13 +50,12 @@ frissit=()=>
 
      
 }
-onStarRatingPress(rating) {
-  
-}
+
+
 
   componentDidMount(){
-   
-     
+    
+
      this.frissit()
 
      let m=this.state.megnyomva;
@@ -129,19 +128,20 @@ onStarRatingPress(rating) {
   
   {
     
-    alert(szam)
+    
     let bemenet={
       bevitel1:szam
       
     }
   
-    fetch('http://localhost:8080/velemenyek' ,{
+    fetch(IP.ipcim+'/velemenyek' ,{
       method: "POST",
       body: JSON.stringify(bemenet),
       headers: {"Content-type": "application/json; charset=UTF-8"}
       } )
       .then((response) => response.json())
       .then((adat) => {
+        
        
   
         
@@ -155,6 +155,63 @@ onStarRatingPress(rating) {
         console.error(error);
       });       
     }
+
+
+    like =(szam)=>
+  
+    {
+      
+      
+      let bemenet={
+        bevitel1:szam
+        
+      }
+    
+      fetch(IP.ipcim+'/like' ,{
+        method: "POST",
+        body: JSON.stringify(bemenet),
+        headers: {"Content-type": "application/json; charset=UTF-8"}
+        } )
+        .then((response) => response.json())
+        .then((adat) => {
+          
+         
+    
+          this.frissit()
+         
+        })
+        .catch((error) =>{
+          console.error(error);
+        });       
+      }
+
+      dislike =(szam)=>
+  
+      {
+        
+        
+        let bemenet={
+          bevitel1:szam
+          
+        }
+      
+        fetch(IP.ipcim+'/dislike' ,{
+          method: "POST",
+          body: JSON.stringify(bemenet),
+          headers: {"Content-type": "application/json; charset=UTF-8"}
+          } )
+          .then((response) => response.json())
+          .then((adat) => {
+            
+           
+      
+            this.frissit()
+           
+          })
+          .catch((error) =>{
+            console.error(error);
+          });       
+        }
     
 
   nov = async()=>{
@@ -232,12 +289,16 @@ onStarRatingPress(rating) {
     let m=this.state.megnyomva
     m[hanyadik]=ratings
     this.setState({megnyomva:m})
-    this.felvitel(ratings,hanyadik)
     this.setState({starCount:ratings})
+    this.felvitel(ratings,hanyadik)
 
   }
+  
+  valueChanged(rating) {
+    console.log(rating);
+  }
 
-
+ 
   
 
  render(){
@@ -248,6 +309,7 @@ onStarRatingPress(rating) {
        </View>
      )
    }
+
    
 
 
@@ -296,7 +358,10 @@ onStarRatingPress(rating) {
 
 
 
-      </View>                
+      </View>    
+
+
+
           
        <FlatList
          data={this.state.dataSource,(this.state.rating)}
@@ -305,48 +370,55 @@ onStarRatingPress(rating) {
            <View style={styles.center}>
              <Image style={styles.image}  source={{uri: IP.ipcim+'/kepek/'+item.kep}}/>
            </View>
+           <View style={{flexDirection:"row"}}>
+             <TouchableOpacity onPress={()=>this.like(item.id)}><Image source={require('./like.png')} resizeMode='contain'  style={{flex:.2, height:50,width:50,margin:10}} /></TouchableOpacity>
+             <Text style={{paddingTop:15, fontSize:25}}>{item.db}</Text>
+             <TouchableOpacity onPress={()=>this.dislike(item.id)}><Image source={require('./dislike.png')} resizeMode='contain' style={{flex:.2, height:50,width:50,margin:10,marginLeft:30  }} /></TouchableOpacity>
+             <Text style={{paddingTop:15, fontSize:25}}>{item.db2}</Text>
+           </View>
            <Text style={styles.title}>{item.nev}</Text>
            <Text style={styles.label}>Cím: {item.lakcim}</Text>
            <Text style={styles.label}>Nyitvatartás: {"\n"}{item.nyitas}</Text>
            <Text style={styles.label}>Telefon: {item.telefon}</Text>
-           <Text style={{padding: 5,fontSize:20,}}>Értékelés: {Math.round((item.atlag + Number.EPSILON) * 100) / 100}/5 </Text>
+           {/*<Text style={{padding: 5,fontSize:20,}}>Értékelés: {Math.round((item.atlag + Number.EPSILON) * 100) / 100}/5 </Text>
 
           
 
           <Text style={{padding: 5,fontSize:20,}}>Értékeld:</Text>
           
-                 {/*<TouchableOpacity
-          onPress=
+                
 
-          style={{alignItems:"center"}}
-          >
-
-          <ReactStars
-            count={5}
-            half={false}
-            onChange={ratingChanged}
-            size={32}
-            color2={'#ffd700'} />
+          
             
           
-                 </TouchableOpacity>*/}
-            <StarRating
+           <StarRating
         disabled={false}
         maxStars={5}
-        rating={this.state.starCount}
+        rating={3}
         selectedStar={(ratings) => this.onStarRatingPress(ratings,item.id)}
         fullStarColor='#ffd700'
         
-      />
+   />*/}
+           
+           
+
+     
+
+
+      
+      
+      
+
+      
  
-            
+ 
 
 
             <Collapse
-            
+            onToggle ={ ()=>this.velemeny(item.id)}
 
             >
-            <CollapseHeader style={styles.gomb} onClick ={ ()=>this.velemeny(item.id)}>
+            <CollapseHeader style={styles.gomb}    >
               <View>
               
                   <Text style={styles.label1}>Vélemények</Text>
@@ -369,6 +441,8 @@ onStarRatingPress(rating) {
             <Text style={{padding: 5,fontSize:15,marginLeft:10}}>{item.velemeny_nev}</Text>
             <Text style={{padding: 5,fontSize:17}}>Vélemény:</Text>
             <Text style={{padding: 5,fontSize:15,marginLeft:10}}>{item.velemeny}</Text>
+
+            
             </View>
             }
             keyExtractor={({velemenyid}, index) => velemenyid}
@@ -524,6 +598,7 @@ const styles = StyleSheet.create({
      },
    velemeny:
    {
+     marginTop:5,
      borderWidth:1,
      borderRadius:10,
      width:270,
